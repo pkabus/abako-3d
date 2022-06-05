@@ -3,15 +3,12 @@ import {
   PerspectiveCamera, Mesh, Raycaster
 } from 'three';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import dat from 'dat.gui';
 
-// set up dat.gui
-const gui = new dat.GUI()
 const world = {
   sphere: {
     radius: 2,
-    widthSegments: 30,
-    heightSegments: 30
+    widthSegments: 50,
+    heightSegments: 50
   },
   abako: {
     rows: 2,
@@ -25,18 +22,6 @@ const world = {
     depth: 0.4
   }
 }
-
-gui.add(world.sphere, 'radius', 0.1, 10).onChange(generateSphereMatrix)
-gui.add(world.sphere, 'widthSegments', 1, 50).onChange(generateSphereMatrix)
-gui.add(world.sphere, 'heightSegments', 1, 50).onChange(generateSphereMatrix)
-gui.add(world.abako, 'rows', 1, 10).step(1).onChange(generateSphereMatrix)
-gui.add(world.abako, 'columns', 1, 10).step(1).onChange(generateSphereMatrix)
-gui.add(world.abako, 'distanceInRow', 5, 50).onChange(generateSphereMatrix)
-gui.add(world.abako, 'distanceInColumn', 5, 50).onChange(generateSphereMatrix)
-gui.add(world.break, 'width', 10, 100).onChange(generateBreaks)
-gui.add(world.break, 'height', 0.1, 5).onChange(generateBreaks)
-gui.add(world.break, 'depth', 0.1, 5).onChange(generateBreaks)
-
 
 
 // set up scene, raycaster, camera, light and renderer
@@ -154,5 +139,44 @@ window.addEventListener('click', (event) => {
   }
 })
 
+function addRow() {
+  if (world.abako.rows < 10) {
+    world.abako.rows++;
+    generateSphereMatrix();
+  }
+}
 
-document.body.appendChild(renderer.domElement);
+function reduceRow() {
+  if (world.abako.rows > 1) {
+    world.abako.rows--;
+    generateSphereMatrix();
+  }
+}
+
+function addColumn() {
+  if (world.abako.columns < 10) {
+    world.abako.columns++;
+    generateSphereMatrix();
+  }
+}
+
+function reduceColumn() {
+  if (world.abako.columns > 1) {
+    world.abako.columns--;
+    generateSphereMatrix();
+  }
+}
+
+
+const addRowButton = document.getElementById('addRowButton');
+const reduceRowButton = document.getElementById('reduceRowButton');
+const addColumnButton = document.getElementById('addColumnButton');
+const reduceColumnButton = document.getElementById('reduceColumnButton');
+
+addRowButton.addEventListener('click', addRow)
+reduceRowButton.addEventListener('click', reduceRow)
+addColumnButton.addEventListener('click', addColumn)
+reduceColumnButton.addEventListener('click', reduceColumn)
+
+const container = document.getElementById( 'container' );
+container.appendChild(renderer.domElement);

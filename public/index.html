@@ -10,13 +10,67 @@
     body {
       margin: 0;
     }
+
+    .control {
+      position: absolute;
+      top: 0px;
+      padding-top: 10px;
+      color: whitesmoke;
+      font-family: sans-serif;
+
+    }
+
+    .control-left {
+      padding-left: 15px;
+    }
+    
+    .control-right {
+      right: 0px;
+      padding-right: 15px;
+    }
+
+    .control-button {
+      font-size: x-large;
+      color: whitesmoke;
+      background-color: transparent;
+      border-radius: 19px;
+      border-color: darkgray;
+    }
+
+    .control-button > span {
+      margin: 15px;
+    }
+
+    #container {
+      position: fixed;
+      top: 0px;
+      left: 0px;
+    }
   </style>
   <title>Abako 3D</title>
 </head>
 
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root"></div>
+  <div id="container"></div>
+
+  <div class="control control-left">
+    <h1>Rows</h1>
+    <button class="control-button" id="addRowButton"><span>+</span></button>
+    <button class="control-button" id="reduceRowButton"><span>-</span></button>
+  </div>
+  
+  <div class="control control-right">
+    <h1>Columns</h1>
+    <button class="control-button" id="addColumnButton"><span>+</span></button>
+    <button class="control-button" id="reduceColumnButton"><span>-</span></button>
+  </div>
+
+  <div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - animation - keyframes<br />
+    Model: <a href="https://artstation.com/artwork/1AGwX" target="_blank" rel="noopener">Littlest Tokyo</a> by
+    <a href="https://artstation.com/glenatron" target="_blank" rel="noopener">Glen Fox</a>, CC Attribution.
+  </div>
   <!--
     This HTML file is a template.
     If you open it directly in the browser, you will see an empty page.
