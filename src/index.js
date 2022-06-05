@@ -1,3 +1,4 @@
+import { ClampToEdgeWrapping } from 'three';
 import {
   SphereGeometry, BoxGeometry, WebGLRenderer, DirectionalLight, Scene, MeshPhongMaterial,
   PerspectiveCamera, Mesh, Raycaster
@@ -84,7 +85,7 @@ function generateSphereMatrix() {
 
 generateSphereMatrix()
 
-const breakMaterial = new MeshPhongMaterial({ color: 0x555555 }) 
+const breakMaterial = new MeshPhongMaterial({ color: 0x555555 })
 let horizontalBreakMesh
 let verticalBreakMesh
 let breakGeometry
@@ -139,6 +140,15 @@ window.addEventListener('click', (event) => {
   }
 })
 
+// rerender when window size changes
+window.addEventListener('resize', (event) => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.position.x = 0;
+  camera.position.y = 0;
+  camera.updateProjectionMatrix();
+})
+
 function addRow() {
   if (world.abako.rows < 10) {
     world.abako.rows++;
@@ -178,5 +188,5 @@ reduceRowButton.addEventListener('click', reduceRow)
 addColumnButton.addEventListener('click', addColumn)
 reduceColumnButton.addEventListener('click', reduceColumn)
 
-const container = document.getElementById( 'container' );
+const container = document.getElementById('container');
 container.appendChild(renderer.domElement);
