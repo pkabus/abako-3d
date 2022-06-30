@@ -37,6 +37,8 @@ frontLight.position.set(0, 0, 10)
 scene.add(frontLight)
 
 const renderer = new WebGLRenderer();
+// assign id to canvas
+renderer.domElement.id = 'abako';
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -75,7 +77,6 @@ function generateSphereMatrix() {
     for (let row = 0; row < world.abako.rows; row++) {
       let positionY = -1 * ((world.abako.rows - 1) * world.abako.distanceInColumn / 2) + row * world.abako.distanceInColumn;
       const sphereMesh = new Mesh(sphereGeometry, redSphereMaterial)
-      console.log(positionX + ", " + positionY)
       sphereMesh.position.set(positionX, positionY, 0)
       sphereMatrix.push(sphereMesh)
       scene.add(sphereMesh)
@@ -127,9 +128,11 @@ function animate() {
 
 animate()
 
-window.addEventListener('click', (event) => {
+document.addEventListener('click', (event) => {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+
+  console.log("Click: " + mouse.x + ", " + mouse.y)
 
   raycaster.setFromCamera(mouse, camera)
   const intersects = raycaster.intersectObjects(sphereMatrix)
