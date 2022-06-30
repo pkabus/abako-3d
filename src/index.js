@@ -29,7 +29,10 @@ const world = {
 const scene = new Scene();
 const raycaster = new Raycaster();
 const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 35;
+camera.position.z = 45;
+
+// most devices have a bigger heigth than width. This offset helps to display the UI and the canvas on the screen
+const DISPLAY_OFFSET_Y = -5
 
 // front light
 const frontLight = new DirectionalLight(0xffffff, 1)
@@ -75,7 +78,7 @@ function generateSphereMatrix() {
   for (let column = 0; column < world.abako.columns; column++) {
     let positionX = -1 * ((world.abako.columns - 1) * world.abako.distanceInRow / 2) + column * world.abako.distanceInRow;
     for (let row = 0; row < world.abako.rows; row++) {
-      let positionY = -1 * ((world.abako.rows - 1) * world.abako.distanceInColumn / 2) + row * world.abako.distanceInColumn;
+      let positionY = -1 * ((world.abako.rows - 1) * world.abako.distanceInColumn / 2) + row * world.abako.distanceInColumn + DISPLAY_OFFSET_Y;
       const sphereMesh = new Mesh(sphereGeometry, redSphereMaterial)
       sphereMesh.position.set(positionX, positionY, 0)
       sphereMatrix.push(sphereMesh)
@@ -101,8 +104,11 @@ function generateBreaks() {
 
   breakGeometry = new BoxGeometry(world.break.width, world.break.height, world.break.depth)
   horizontalBreakMesh = new Mesh(breakGeometry, breakMaterial)
+  horizontalBreakMesh.position.set(0, DISPLAY_OFFSET_Y, 0)
   verticalBreakMesh = new Mesh(breakGeometry, breakMaterial)
+  verticalBreakMesh.position.set(0, DISPLAY_OFFSET_Y, 0)
   verticalBreakMesh.rotation.z = Math.PI / 2
+
   scene.add(horizontalBreakMesh)
   scene.add(verticalBreakMesh)
 }
@@ -152,44 +158,24 @@ window.addEventListener('resize', (event) => {
   camera.updateProjectionMatrix();
 })
 
-function addRow() {
-  if (world.abako.rows < 10) {
-    world.abako.rows++;
-    generateSphereMatrix();
-  }
+function updateRows(value) {
+  world.abako.rows = value;
+  generateSphereMatrix();
 }
 
-function reduceRow() {
-  if (world.abako.rows > 1) {
-    world.abako.rows--;
-    generateSphereMatrix();
-  }
-}
-
-function addColumn() {
-  if (world.abako.columns < 10) {
-    world.abako.columns++;
-    generateSphereMatrix();
-  }
-}
-
-function reduceColumn() {
-  if (world.abako.columns > 1) {
-    world.abako.columns--;
-    generateSphereMatrix();
-  }
+function updateColumns(value) {
+  world.abako.columns = value;
+  generateSphereMatrix();
 }
 
 
-const addRowButton = document.getElementById('addRowButton');
-const reduceRowButton = document.getElementById('reduceRowButton');
-const addColumnButton = document.getElementById('addColumnButton');
-const reduceColumnButton = document.getElementById('reduceColumnButton');
+const rowSlider = document.getElementById("rowSlider");
+const columnSlider = document.getElementById("columnSlider");
 
-addRowButton.addEventListener('click', addRow)
-reduceRowButton.addEventListener('click', reduceRow)
-addColumnButton.addEventListener('click', addColumn)
-reduceColumnButton.addEventListener('click', reduceColumn)
+
+rowSlider.addEventListener('input', () => updateRows(rowSlider.value));
+
+columnSlider.addEventListener('input', () => updateColumns(columnSlider.value));
 
 const container = document.getElementById('container');
 container.appendChild(renderer.domElement);
