@@ -1,4 +1,3 @@
-import { ClampToEdgeWrapping } from 'three';
 import {
   SphereGeometry, BoxGeometry, WebGLRenderer, DirectionalLight, Scene, MeshPhongMaterial,
   PerspectiveCamera, Mesh, Raycaster
@@ -49,42 +48,53 @@ controls.enableRotate = false;
 
 
 
-const redSphereMaterial = new MeshPhongMaterial({ color: 0xff0000 })
-const blueSphereMaterial = new MeshPhongMaterial({ color: 0x0000ff })
-
-let sphereGeometry;
-
-function generateGeometry() {
-  sphereGeometry = new SphereGeometry(world.sphere.radius, world.sphere.widthSegments, world.sphere.heightSegments)
-}
+const redMaterial = new MeshPhongMaterial({ color: 0xff0000 })
+const blueMaterial = new MeshPhongMaterial({ color: 0x0000ff })
+const sphereGeometry = new SphereGeometry(world.sphere.radius, world.sphere.widthSegments, world.sphere.heightSegments)
 
 function toggleMaterial(sphere) {
-  if (sphere.material === redSphereMaterial) {
-    sphere.material = blueSphereMaterial
-  } else if (sphere.material === blueSphereMaterial) {
-    sphere.material = redSphereMaterial
+  if (sphere.material === redMaterial) {
+    sphere.material = blueMaterial
+  } else if (sphere.material === blueMaterial) {
+    sphere.material = redMaterial
   }
 }
 
 let sphereMatrix = []
 
 function generateSphereMatrix() {
-  generateGeometry()
-  sphereMatrix.forEach((mesh) => {
-    mesh.geometry.dispose()
-    scene.remove(mesh)
+  sphereMatrix.forEach((row) => {
+    row.forEach((mesh) => {
+      mesh.geometry.dispose()
+      scene.remove(mesh)
+    })
   })
-  sphereMatrix = [];
-  for (let column = 0; column < world.abako.columns; column++) {
-    let positionX = -1 * ((world.abako.columns - 1) * world.abako.distanceInRow / 2) + column * world.abako.distanceInRow;
-    for (let row = 0; row < world.abako.rows; row++) {
-      let positionY = -1 * ((world.abako.rows - 1) * world.abako.distanceInColumn / 2) + row * world.abako.distanceInColumn + DISPLAY_OFFSET_Y;
-      const sphereMesh = new Mesh(sphereGeometry, redSphereMaterial)
+
+  const newMatrix = []
+
+  for (let row = 0; row < world.abako.rows; row++) {
+    // new rows shall be added at the bottom
+    let positionY = 1 * ((world.abako.rows - 1) * world.abako.distanceInColumn / 2) - row * world.abako.distanceInColumn + DISPLAY_OFFSET_Y;
+    newMatrix[row] = []
+    for (let column = 0; column < world.abako.columns; column++) {
+      // new columns shall be added on the right side
+      let positionX = -1 * ((world.abako.columns - 1) * world.abako.distanceInRow / 2) + column * world.abako.distanceInRow;
+
+      // decide whether a previous sphere existed. If so, take its material for the new one.
+      let sphereMesh = undefined;
+      if (sphereMatrix[row] && sphereMatrix[row][column] && sphereMatrix[row][column].material === blueMaterial) {
+        sphereMesh = new Mesh(sphereGeometry, blueMaterial)
+      } else {
+        sphereMesh = new Mesh(sphereGeometry, redMaterial)
+      }
+
       sphereMesh.position.set(positionX, positionY, 0)
-      sphereMatrix.push(sphereMesh)
       scene.add(sphereMesh)
+      newMatrix[row][column] = sphereMesh;
     }
   }
+
+  sphereMatrix = newMatrix;
 }
 
 generateSphereMatrix()
@@ -138,10 +148,11 @@ document.addEventListener('click', (event) => {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
 
-  console.log("Click: " + mouse.x + ", " + mouse.y)
-
   raycaster.setFromCamera(mouse, camera)
-  const intersects = raycaster.intersectObjects(sphereMatrix)
+
+  let spheres = []
+  sphereMatrix.forEach((row) => spheres.push(...row));
+  const intersects = raycaster.intersectObjects(spheres)
   if (intersects.length > 0) {
     intersects.forEach((intersect) => {
       toggleMaterial(intersect.object)
