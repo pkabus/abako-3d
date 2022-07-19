@@ -73,15 +73,9 @@ function setPoint(event) {
   return point;
 }
 
-document.addEventListener('touchstart', (event) => drawStart(event));
-document.addEventListener('touchmove', (event) => drawMove(event));
-document.addEventListener('touchend', (event) => drawEnd(event));
-
-document.addEventListener('mousedown', (event) => drawStart(event), true);
-document.addEventListener('mousemove', (event) => drawMove(event), true);
-document.addEventListener('mouseup', (event) => drawEnd(event), true);
-
-
+document.addEventListener('pointermove', (event) => drawMove(event), true);
+document.addEventListener('pointerdown', (event) => drawStart(event), true);
+document.addEventListener('pointerup', (event) => drawEnd(event), true);
 
 function drawStart(event) {
   cornerMouseDown = setPoint(event);
