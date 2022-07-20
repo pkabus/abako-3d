@@ -19,6 +19,9 @@ export const world = {
         width: 50,
         height: 0.4,
         depth: 0.4
+    },
+    frame: {
+        border: 0.3
     }
 }
 

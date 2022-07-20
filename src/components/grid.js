@@ -71,9 +71,9 @@ export function generateAxis() {
 
     axisGeometry = new BoxGeometry(world.break.width, world.break.height, world.break.depth)
     horizontalAxisMesh = new Mesh(axisGeometry, axisMaterial)
-    horizontalAxisMesh.position.set(0, DISPLAY_OFFSET_Y, 0)
+    horizontalAxisMesh.position.set(0, DISPLAY_OFFSET_Y, -2)
     verticalAxisMesh = new Mesh(axisGeometry, axisMaterial)
-    verticalAxisMesh.position.set(0, DISPLAY_OFFSET_Y, 0)
+    verticalAxisMesh.position.set(0, DISPLAY_OFFSET_Y, -2)
     verticalAxisMesh.rotation.z = Math.PI / 2
 
     scene.add(horizontalAxisMesh)

@@ -1,4 +1,5 @@
-import { createFrame, planeMesh, detectFramedSpheres } from './components/frame';
+import { Vector3 } from 'three';
+import { createFrame, planeMesh, detectFramedSpheres, createAlignedFrame } from './components/frame';
 import { generateAxis, generateSphereMatrix, resetSpheres, sphereMatrix, updateColumns, updateRows } from './components/grid';
 import { blueSphereMaterial, toggleMaterial } from './components/sphere';
 import { camera, raycaster, renderer, scene } from './modules/setup';
@@ -85,17 +86,38 @@ function drawStart(event) {
 function drawEnd(event) {
   cornerMouseUp = setPoint(event)
 
+  // the user frame represents the user input
+  let userFrame = undefined
   // if both points are set, create a frame
-  let finalFrame = undefined
   if (cornerMouseDown && cornerMouseUp) {
-    finalFrame = createFrame(cornerMouseDown, cornerMouseUp);
+    userFrame = createFrame(cornerMouseDown, cornerMouseUp);
+  }
+
+  // the final represents the framed aligned to the affected spheres
+  let finalFrame = undefined
+
+  // detect affected spheres
+  let positions = [];
+  if (userFrame) {
+    const framedSpheres = detectFramedSpheres(userFrame.upperLeftCorner, userFrame.bottomRightCorner);
+    framedSpheres.forEach((mesh) => mesh.material = blueSphereMaterial);
+
+    positions = framedSpheres.map((mesh) => {
+      const position = new Vector3();
+      mesh.getWorldPosition(position);
+      return position;
+    });
+  }
+
+  console.debug('Frame ' + positions.length + ' spheres.')
+  // length gives us the number of spheres affected
+  if (positions.length > 0) {
+    finalFrame = createAlignedFrame(positions);
   }
 
   if (finalFrame) {
     scene.add(finalFrame.groupedMesh)
     frames.push(finalFrame)
-    const framedSpheres = detectFramedSpheres(finalFrame);
-    framedSpheres.forEach((mesh) => mesh.material = blueSphereMaterial);
   }
 
   if (newFrame) {
