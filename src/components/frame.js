@@ -89,7 +89,7 @@ export function createAlignedFrame(positionsOfSpheres) {
 
 export function detectFramedSpheres(upperLeftCorner, bottomRightCorner) {
     const result = [];
-    scene.updateMatrixWorld()
+    scene.updateMatrixWorld();
     sphereMatrix.forEach((row) => {
         row.filter((mesh) => {
             const position = new Vector3();
@@ -101,7 +101,7 @@ export function detectFramedSpheres(upperLeftCorner, bottomRightCorner) {
     return result;
 }
 
-
+// this invisible helper plane defines where frames can be drawn
 const plane = new PlaneGeometry(100, 100);
 const transparentMaterial = new MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.0 })
 export const planeMesh = new Mesh(plane, transparentMaterial)

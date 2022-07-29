@@ -22,6 +22,13 @@ export const world = {
     },
     frame: {
         border: 0.3
+    },
+    stickynote: {
+        textSize: 3,
+        textHeight: 0.1,
+        curveSegments: 30,
+        startX: -30,
+        startY: 10
     }
 }
 

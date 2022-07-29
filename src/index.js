@@ -1,26 +1,19 @@
-import { Vector3 } from 'three';
-import { createFrame, planeMesh, detectFramedSpheres, createAlignedFrame } from './components/frame';
-import { generateAxis, generateSphereMatrix, resetSpheres, sphereMatrix, updateColumns, updateRows } from './components/grid';
-import { blueSphereMaterial, toggleMaterial } from './components/sphere';
+import { generateAxis } from './components/axis';
+import { generateSphereMatrix, resetSpheres, sphereMatrix, updateColumns, updateRows } from './components/grid';
+import { toggleMaterial } from './components/sphere';
+import { generateStickynote } from './components/stickynote';
+import { drawingAFrame, resetFrames, setFrameEnd, setFrameStart, setMovingFrameEnd } from './modules/frame_module';
 import { camera, raycaster, renderer, scene } from './modules/setup';
-
-
+import { draggingStickynote, dragStickynote, setMovingStickynote, stopDrag } from './modules/stickynote_module';
 
 // generate initial matrix with rows/columns set in world (see setup)
 generateSphereMatrix()
 
-
-
 // generate axis
 generateAxis()
 
-
-
-const mouse = {
-  x: undefined,
-  y: undefined
-}
-
+//const notePlane = createNotePlane();
+generateStickynote('test')
 
 // animate
 let frame = 0
@@ -32,8 +25,22 @@ function animate() {
 
 animate()
 
+// rerender when window size changes
+window.addEventListener('resize', (event) => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.position.x = 0;
+  camera.position.y = 0;
+  camera.updateProjectionMatrix();
+})
+
+const mouse = {
+  x: undefined,
+  y: undefined
+}
+
 document.addEventListener('click', (event) => {
-  if (newFrame) {
+  if (drawingAFrame() || draggingStickynote()) {
     return;
   }
 
@@ -53,142 +60,56 @@ document.addEventListener('click', (event) => {
 })
 
 
-let cornerMouseDown = undefined;
-let cornerMouseUp = undefined;
-let temporaryMouseUp = undefined;
-let newFrame = undefined;
-let frames = []
-
-function setPoint(event) {
-  const localMouse = { x: (event.clientX / window.innerWidth) * 2 - 1, y: -(event.clientY / window.innerHeight) * 2 + 1 }
-  raycaster.setFromCamera(localMouse, camera)
-
-  let point = undefined;
-
-  const intersects = raycaster.intersectObject(planeMesh)
-  if (intersects.length === 1) {
-    const intersection = intersects[0];
-    point = { x: intersection.point.x, y: intersection.point.y }
-  }
-
-  return point;
-}
-
-document.addEventListener('pointermove', (event) => drawMove(event), true);
-document.addEventListener('pointerdown', (event) => drawStart(event), true);
-document.addEventListener('pointerup', (event) => drawEnd(event), true);
-
-function drawStart(event) {
-  cornerMouseDown = setPoint(event);
-}
-
-
-function drawEnd(event) {
-  cornerMouseUp = setPoint(event)
-
-  // the user frame represents the user input
-  let userFrame = undefined
-  // if both points are set, create a frame
-  if (cornerMouseDown && cornerMouseUp) {
-    userFrame = createFrame(cornerMouseDown, cornerMouseUp);
-  }
-
-  // the final represents the framed aligned to the affected spheres
-  let finalFrame = undefined
-
-  // detect affected spheres
-  let positions = [];
-  if (userFrame) {
-    const framedSpheres = detectFramedSpheres(userFrame.upperLeftCorner, userFrame.bottomRightCorner);
-    framedSpheres.forEach((mesh) => mesh.material = blueSphereMaterial);
-
-    positions = framedSpheres.map((mesh) => {
-      const position = new Vector3();
-      mesh.getWorldPosition(position);
-      return position;
-    });
-  }
-
-  console.debug('Frame ' + positions.length + ' spheres.')
-  // length gives us the number of spheres affected
-  if (positions.length > 0) {
-    finalFrame = createAlignedFrame(positions);
-  }
-
-  if (finalFrame) {
-    scene.add(finalFrame.groupedMesh)
-    frames.push(finalFrame)
-  }
-
-  if (newFrame) {
-    scene.remove(newFrame.groupedMesh);
-  }
-
-  cornerMouseDown = undefined;
-  temporaryMouseUp = undefined;
-  cornerMouseUp = undefined;
-
-  // need a delay here to signal the "click" event to not change a sphere if a frame has been drawn
-  setTimeout(() => {
-    newFrame = undefined;
-  }, 50);
-}
-
-
-function drawMove(event) {
-  // a mouse move without a mousedown is not interesting
-  if (!cornerMouseDown) {
+document.addEventListener('pointerdown', (event) => {
+  // check whether stickynote is intersected
+  dragStickynote(event)
+  if (draggingStickynote()) {
     return;
   }
 
-  // if there is already a temporary frame drawn, remove it from the scene
-  if (newFrame) {
-    scene.remove(newFrame.groupedMesh)
-    newFrame = undefined
+  // maybe a frame shall be drawn
+  setFrameStart(event);
+}, true);
+
+document.addEventListener('pointermove', (event) => {
+  // if stickynote is dragged
+  if (draggingStickynote()) {
+    setMovingStickynote(event);
+    return;
   }
 
-  temporaryMouseUp = setPoint(event)
+  // 
+  if (drawingAFrame()) {
+    setMovingFrameEnd(event);
+  }
+}, true);
 
-  if (temporaryMouseUp && cornerMouseDown) {
-    newFrame = createFrame(cornerMouseDown, temporaryMouseUp)
+document.addEventListener('pointerup', (event) => {
+  // if stickynote is dragged
+  if (draggingStickynote()) {
+    stopDrag(event);
+    return;
   }
 
-  if (newFrame) {
-    scene.add(newFrame.groupedMesh)
+  // if a frame is drawn
+  if (drawingAFrame()) {
+    setFrameEnd(event);
+    return;
   }
-}
-
-
-// rerender when window size changes
-window.addEventListener('resize', (event) => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.position.x = 0;
-  camera.position.y = 0;
-  camera.updateProjectionMatrix();
-})
-
-function resetFrames() {
-  frames.forEach((frame) => {
-    scene.remove(frame.groupedMesh);
-    frame.groupedMesh.remove();
-  })
-
-  frames = [];
-}
+}, true);
 
 function resetAll() {
   resetFrames();
   resetSpheres();
 }
 
+// html reset button
 const resetButton = document.getElementById("resetButton");
 resetButton.addEventListener("click", () => resetAll());
 
-
+// html sliders
 const rowSlider = document.getElementById("rowSlider");
 const columnSlider = document.getElementById("columnSlider");
-
 
 rowSlider.addEventListener('input', () => {
   resetFrames();
@@ -199,5 +120,6 @@ columnSlider.addEventListener('input', () => {
   updateColumns(columnSlider.value)
 });
 
+// append render output to html tree
 const container = document.getElementById('container');
 container.appendChild(renderer.domElement);
