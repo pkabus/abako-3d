@@ -11,6 +11,7 @@ export let newFrame = undefined;
 let frames = []
 
 export function drawingAFrame() {
+    // I have no idea what this means
     return typeof cornerMouseDown, newFrame !== 'undefined'
 }
 

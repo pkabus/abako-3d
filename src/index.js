@@ -1,10 +1,10 @@
 import { generateAxis } from './components/axis';
 import { generateSphereMatrix, resetSpheres, sphereMatrix, updateColumns, updateRows } from './components/grid';
 import { toggleMaterial } from './components/sphere';
-import { generateStickynote } from './components/stickynote';
+import { generateStickynote, removeStickynote } from './components/stickynote';
 import { drawingAFrame, resetFrames, setFrameEnd, setFrameStart, setMovingFrameEnd } from './modules/frame_module';
-import { camera, raycaster, renderer, scene } from './modules/setup';
-import { draggingStickynote, dragStickynote, setMovingStickynote, stopDrag } from './modules/stickynote_module';
+import { camera, raycaster, renderer, scene, world } from './modules/setup';
+import { createStickynote, draggingStickynote, dragStickynote, setMovingStickynote, stopDrag } from './modules/stickynote_module';
 
 // generate initial matrix with rows/columns set in world (see setup)
 generateSphereMatrix()
@@ -13,7 +13,7 @@ generateSphereMatrix()
 generateAxis()
 
 //const notePlane = createNotePlane();
-generateStickynote('test')
+//generateStickynote('test')
 
 // animate
 let frame = 0
@@ -40,9 +40,9 @@ const mouse = {
 }
 
 document.addEventListener('click', (event) => {
-  if (drawingAFrame() || draggingStickynote()) {
-    return;
-  }
+  // if (drawingAFrame() || draggingStickynote()) {
+  //   return;
+  // }
 
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
@@ -58,7 +58,6 @@ document.addEventListener('click', (event) => {
     })
   }
 })
-
 
 document.addEventListener('pointerdown', (event) => {
   // check whether stickynote is intersected
@@ -103,13 +102,40 @@ function resetAll() {
   resetSpheres();
 }
 
+const textInput = document.getElementById("textInput");
+textInput.value = '';
+// textInput.addEventListener("focus", (event) => event.target.value = '')
+document.addEventListener("keydown", () => textInput.focus());
+textInput.addEventListener("input", (event) => addText(event.target.value));
+
+function addText(text) {
+  if (text.trim().length === 0) {
+    removeStickynote();
+    return;
+  }
+
+  createStickynote(text)
+}
+
+function newStickynote(event) {
+  //textInput.value = '';
+  //addText('Start typing');
+  textInput.focus();
+}
+
+// html text button
+//const textButton = document.getElementById("textButton");
+//textButton.addEventListener("click", (event) => newStickynote(event));
+
 // html reset button
 const resetButton = document.getElementById("resetButton");
 resetButton.addEventListener("click", () => resetAll());
 
 // html sliders
 const rowSlider = document.getElementById("rowSlider");
+rowSlider.value = world.abako.rows;
 const columnSlider = document.getElementById("columnSlider");
+columnSlider.value = world.abako.columns;
 
 rowSlider.addEventListener('input', () => {
   resetFrames();

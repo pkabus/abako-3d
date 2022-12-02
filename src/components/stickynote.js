@@ -13,16 +13,20 @@ const textMaterial = new MeshBasicMaterial({ color: 0x000000 })
 const loader = new FontLoader();
 const planeMaterial = new MeshBasicMaterial({ color: 0xeeeeee, transparent: true, opacity: 0.9 })
 
-function createNotePlane(width = 20, height = 20) {
+function createNotePlane(width = 20, height = 20, x = world.stickynote.startX, y = world.stickynote.startY) {
     const plane = new PlaneGeometry(width, height);
     const notePlaneMesh = new Mesh(plane, planeMaterial)
-    notePlaneMesh.position.set(world.stickynote.startX, world.stickynote.startY, positionZ)
+    notePlaneMesh.position.set(x, y, positionZ)
 
     return notePlaneMesh;
 }
 
-export function generateStickynote(text) {
-    loader.load('/fonts/helvetiker_regular.typeface.json', function (font) {
+export function generateStickynote(text, x = world.stickynote.startX, y = world.stickynote.startY) {
+    if (!text || text === '') {
+        return;
+    }
+    console.log("Create stickynote at x: " + x + ", y: " + y)
+    loader.load('/fonts/ABeeZee_regular.typeface.json', function (font) {
         
         textGeometry = new TextGeometry(text, {
             font: font,
@@ -33,7 +37,7 @@ export function generateStickynote(text) {
         textGeometry.center()
         
         textMesh = new Mesh(textGeometry, textMaterial)
-        textMesh.position.set(world.stickynote.startX, world.stickynote.startY, positionZ)
+        textMesh.position.set(x, y, positionZ)
         
         // create plane
         let xCoordinates = [];
@@ -48,7 +52,7 @@ export function generateStickynote(text) {
         const yMin = Math.min(...yCoordinates)
         const yMax = Math.max(...yCoordinates)
         
-        stickynoteMesh = createNotePlane(xMax - xMin + 2, yMax - yMin + 2)
+        stickynoteMesh = createNotePlane(xMax - xMin + 2, yMax - yMin + 2, x, y)
         
         if (stickynoteMesh && textMesh) {
             stickynoteObject = new Object3D();
@@ -57,7 +61,14 @@ export function generateStickynote(text) {
             scene.add(stickynoteObject);
         }
     });
+}
 
+export function removeStickynote() {
+    if (stickynoteObject) {
+        scene.remove(stickynoteObject);
+        textMesh = undefined;
+        stickynoteMesh = undefined;
+    }
 }
 
 // this invisible helper plane defines where stickynote moving area
