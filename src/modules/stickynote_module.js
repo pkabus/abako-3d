@@ -58,8 +58,7 @@ export function stopDrag(event) {
     scene.updateMatrixWorld();
     lastPosition = new Vector3();
     stickynoteObject.getWorldPosition(lastPosition);
-    console.log("World position: " + JSON.stringify(lastPosition, null, 2))
-
+    
     // finish drag and drop
     // need a delay here to signal the "click" event to not change a sphere
     setTimeout(() => {

@@ -1,7 +1,7 @@
 import { generateAxis } from './components/axis';
 import { generateSphereMatrix, resetSpheres, sphereMatrix, updateColumns, updateRows } from './components/grid';
 import { toggleMaterial } from './components/sphere';
-import { generateStickynote, removeStickynote } from './components/stickynote';
+import { removeStickynote } from './components/stickynote';
 import { drawingAFrame, resetFrames, setFrameEnd, setFrameStart, setMovingFrameEnd } from './modules/frame_module';
 import { camera, raycaster, renderer, scene, world } from './modules/setup';
 import { createStickynote, draggingStickynote, dragStickynote, setMovingStickynote, stopDrag } from './modules/stickynote_module';
@@ -11,9 +11,6 @@ generateSphereMatrix()
 
 // generate axis
 generateAxis()
-
-//const notePlane = createNotePlane();
-//generateStickynote('test')
 
 // animate
 let frame = 0
@@ -40,10 +37,6 @@ const mouse = {
 }
 
 document.addEventListener('click', (event) => {
-  // if (drawingAFrame() || draggingStickynote()) {
-  //   return;
-  // }
-
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
 
@@ -117,15 +110,9 @@ function addText(text) {
   createStickynote(text)
 }
 
-function newStickynote(event) {
-  //textInput.value = '';
-  //addText('Start typing');
-  textInput.focus();
-}
-
 // html text button
-//const textButton = document.getElementById("textButton");
-//textButton.addEventListener("click", (event) => newStickynote(event));
+const textButton = document.getElementById("textButton");
+textButton.addEventListener("click", () => textInput.focus());
 
 // html reset button
 const resetButton = document.getElementById("resetButton");

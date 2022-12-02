@@ -4,6 +4,7 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { DISPLAY_OFFSET_Y, scene, world } from '../modules/setup';
 
 
+let generating = false;
 const positionZ = world.sphere.radius + 1
 let textMesh = undefined;
 let stickynoteMesh = undefined;
@@ -22,10 +23,12 @@ function createNotePlane(width = 20, height = 20, x = world.stickynote.startX, y
 }
 
 export function generateStickynote(text, x = world.stickynote.startX, y = world.stickynote.startY) {
-    if (!text || text === '') {
+    if (!text || text === '' || generating) {
         return;
     }
-    console.log("Create stickynote at x: " + x + ", y: " + y)
+
+    generating = true;
+
     loader.load('/fonts/ABeeZee_regular.typeface.json', function (font) {
         
         textGeometry = new TextGeometry(text, {
@@ -60,6 +63,8 @@ export function generateStickynote(text, x = world.stickynote.startX, y = world.
             stickynoteObject.add(textMesh)
             scene.add(stickynoteObject);
         }
+
+        generating = false;
     });
 }
 
