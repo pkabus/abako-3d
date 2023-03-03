@@ -110,10 +110,6 @@ function addText(text) {
   createStickynote(text)
 }
 
-// html text button
-const textButton = document.getElementById("textButton");
-textButton.addEventListener("click", () => textInput.focus());
-
 // html reset button
 const resetButton = document.getElementById("resetButton");
 resetButton.addEventListener("click", () => resetAll());

@@ -21,8 +21,16 @@
     }
 
     .control-left {
+      width: 200px;
       padding-top: 20px;
       padding-left: 15px;
+    }
+
+    /* if a device's width is 768 or less, the following css values will be overwritten  */
+    @media (max-width: 768px) {
+      .control-left {
+        width: 40%;
+      }
     }
 
     .control-right {
@@ -36,7 +44,7 @@
       right: 0px;
       margin-left: auto;
       margin-right: auto;
-      width: 200px;
+      width: 100px;
     }
 
     .control-button {
@@ -72,6 +80,11 @@
     .slidecontainer {
       width: 100%;
       /* Width of the outside container */
+    }
+
+    .buttoncontainer {
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
 
     .slider {
@@ -116,20 +129,21 @@
     <div class="slidecontainer">
       <input id="rowSlider" type="range" min="1" max="10" value="2" class="slider" id="myRange">
     </div>
-  </div>
-
-
-  <div class="control container-center">
-    <button id="resetButton" class="control-button button-left"><span>Reset</span></button>
-    <button id="textButton" class="control-button button-right"><span>Text</span></button>
-    <input id="textInput" class="transparent" type="text"></input>
-  </div>
-
-  <div class="control control-right">
     <h1>Columns</h1>
     <div class="slidecontainer">
       <input id="columnSlider" type="range" min="1" max="10" value="10" class="slider" id="myRange">
     </div>
+    <div class="buttoncontainer">
+      <button id="resetButton" class="control-button"><span>Reset</span></button>
+    </div>
+    <input id="textInput" class="transparent" type="text"></input>
+  </div>
+
+
+  <div class="control container-center">
+  </div>
+
+  <div class="control control-right">
   </div>
 
   <div id="info">
